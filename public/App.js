@@ -38,7 +38,7 @@ class IssueRow extends React.Component {
       style: style
     }, this.props.issue_id), /*#__PURE__*/React.createElement("td", {
       style: style
-    }, this.props.issue_title));
+    }, this.props.children));
   }
 
 }
@@ -59,13 +59,11 @@ class IssueTable extends React.Component {
       style: rowStyle
     }, "Title"))), /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement(IssueRow, {
       rowStyle: rowStyle,
-      issue_id: 1,
-      issue_title: "This is first Issue"
-    }), /*#__PURE__*/React.createElement(IssueRow, {
+      issue_id: 1
+    }, "This is first Issue"), /*#__PURE__*/React.createElement(IssueRow, {
       rowStyle: rowStyle,
-      issue_id: 2,
-      issue_title: "This is second Issue"
-    })));
+      issue_id: 2
+    }, "This is ", /*#__PURE__*/React.createElement("b", null, "Second"), " Issue")));
   }
 
 }

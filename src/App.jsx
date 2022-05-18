@@ -34,7 +34,7 @@
             return (
                 <tr>
                     <td style={style}>{this.props.issue_id}</td>
-                    <td style={style}>{this.props.issue_title}</td>
+                    <td style={style}>{this.props.children}</td>
                 </tr>
                 
             )
@@ -53,8 +53,10 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <IssueRow rowStyle={rowStyle} issue_id={1} issue_title="This is first Issue"/>
-                        <IssueRow rowStyle={rowStyle} issue_id={2} issue_title="This is second Issue"/>
+                        <IssueRow rowStyle={rowStyle} issue_id={1}>This is first Issue</IssueRow>
+                        <IssueRow rowStyle={rowStyle} issue_id={2}>
+                        This is <b>Second</b> Issue
+                        </IssueRow>
                     </tbody>
                 </table>
             )
