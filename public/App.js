@@ -33,12 +33,9 @@ class IssueFilter extends React.Component {
 
 class IssueRow extends React.Component {
   render() {
-    const style = this.props.rowStyle;
-    return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", {
-      style: style
-    }, this.props.issue_id), /*#__PURE__*/React.createElement("td", {
-      style: style
-    }, this.props.children));
+    //const style = this.props.rowStyle;
+    const issue = this.props.issue;
+    return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, issue.id), /*#__PURE__*/React.createElement("td", null, issue.status), /*#__PURE__*/React.createElement("td", null, issue.owner), /*#__PURE__*/React.createElement("td", null, issue.effort), /*#__PURE__*/React.createElement("td", null, issue.created.toDateString()), /*#__PURE__*/React.createElement("td", null, issue.due.toDateString()), /*#__PURE__*/React.createElement("td", null, issue.title));
   }
 
 }
@@ -49,21 +46,34 @@ class IssueTable extends React.Component {
       border: "1px solid silver",
       padding: 4
     };
-    return /*#__PURE__*/React.createElement("table", {
-      style: {
-        borderCollapse: "collapse"
-      }
-    }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", {
-      style: rowStyle
-    }, "ID"), /*#__PURE__*/React.createElement("th", {
-      style: rowStyle
-    }, "Title"))), /*#__PURE__*/React.createElement("tbody", null, /*#__PURE__*/React.createElement(IssueRow, {
-      rowStyle: rowStyle,
-      issue_id: 1
-    }, "This is first Issue"), /*#__PURE__*/React.createElement(IssueRow, {
-      rowStyle: rowStyle,
-      issue_id: 2
-    }, "This is ", /*#__PURE__*/React.createElement("b", null, "Second"), " Issue")));
+    const issues = [{
+      id: 1,
+      status: 'resolved',
+      owner: 'Person-A',
+      effort: 20,
+      created: new Date('2022-05-16'),
+      due: new Date('2022-08-20'),
+      title: 'Issue - 1'
+    }, {
+      id: 2,
+      status: 'assigned',
+      owner: 'Person-B',
+      effort: 5,
+      created: new Date('2022-05-18'),
+      due: new Date('2022-08-22'),
+      title: 'Issue - 2'
+    }];
+    const issueRows = issues.map(issue => /*#__PURE__*/React.createElement(IssueRow, {
+      key: issue.id,
+      issue: issue
+    }));
+    return (
+      /*#__PURE__*/
+      // <table style={{borderCollapse: "collapse"}}>             
+      React.createElement("table", {
+        className: "bordered-table"
+      }, /*#__PURE__*/React.createElement("thead", null, /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("th", null, "ID"), /*#__PURE__*/React.createElement("th", null, "STATUS"), /*#__PURE__*/React.createElement("th", null, "OWNER"), /*#__PURE__*/React.createElement("th", null, "EFFORT"), /*#__PURE__*/React.createElement("th", null, "CREATED"), /*#__PURE__*/React.createElement("th", null, "DUE"), /*#__PURE__*/React.createElement("th", null, "TITLE"))), /*#__PURE__*/React.createElement("tbody", null, issueRows))
+    );
   }
 
 }
