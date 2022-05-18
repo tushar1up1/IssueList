@@ -42,10 +42,7 @@ class IssueRow extends React.Component {
 
 class IssueTable extends React.Component {
   render() {
-    const rowStyle = {
-      border: "1px solid silver",
-      padding: 4
-    };
+    //const rowStyle = {border: "1px solid silver", padding: 4};
     const issues = [{
       id: 1,
       status: 'resolved',

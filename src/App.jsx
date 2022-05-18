@@ -54,7 +54,7 @@
 
     class IssueTable extends React.Component {
         render() {
-            const rowStyle = {border: "1px solid silver", padding: 4};
+            //const rowStyle = {border: "1px solid silver", padding: 4};
             const issues = [
                 {id: 1, status: 'resolved', owner: 'Person-A', effort: 20, created: new Date('2022-05-16'), due: new Date('2022-08-20'), title: 'Issue - 1'},
                 {id: 2, status: 'assigned', owner: 'Person-B', effort: 5, created: new Date('2022-05-18'), due: new Date('2022-08-22'), title: 'Issue - 2'}
