@@ -21,6 +21,15 @@
             )
         }
     }*/
+    function HelloWorld(props) {
+        return (
+        <div title="Outer div">
+            <h1>Hello World!</h1>
+            <h1>Welcome: {props.message}</h1>
+        </div>
+        );
+    }
+    <HelloWorld message="Full-Stack Programming" />
     class IssueFilter extends React.Component {
         render() {
             return (
@@ -28,6 +37,7 @@
             )
         }
     }
+    
     class IssueRow extends React.Component {
         render() {
             //const style = this.props.rowStyle;
@@ -130,13 +140,34 @@
     class IssueAdd extends React.Component {
         constructor() {
             super(); //when you have to call "this" in a constructor, you have to call super first.
+            this.handleSubmit = this.handleSubmit.bind(this);
+            /*
+            //Remove this 
             setTimeout(() => {
                 this.props.createIssue(newIssue);
             }, 3000);
+
+            */
         }
+        handleSubmit(e) {
+            e.preventDefault();
+            const form = document.forms.issueAdd;
+            const issue = {
+            owner: form.owner.value, title: form.title.value, status: 'New',
+            }
+            this.props.createIssue(issue);
+            form.owner.value = ""; 
+            form.title.value = "";
+        }
+
         render() {
             return (                 
-                <div>This is placeholder for IssueAdd Component</div>                
+                //<div>This is placeholder for IssueAdd Component</div>    
+                <form name="issueAdd" onSubmit={this.handleSubmit}>
+                    <input type="text" name="owner" placeholder="Owner" />
+                    <input type="text" name="title" placeholder="Title" />
+                    <button>Add</button>
+                </form>            
             )
         }
     }
@@ -176,5 +207,6 @@
             )
         }
     }
+    //const element = <HelloWorld message="Full-Stack Programming" />;
     const element = <IssueList />;
     ReactDOM.render(element, document.getElementById('contents'));

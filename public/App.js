@@ -24,6 +24,17 @@
         )
     }
 }*/
+function HelloWorld(props) {
+  return /*#__PURE__*/React.createElement("div", {
+    title: "Outer div"
+  }, /*#__PURE__*/React.createElement("h1", null, "Hello World!"), /*#__PURE__*/React.createElement("h1", null, "Welcome: ", props.message));
+}
+
+/*#__PURE__*/
+React.createElement(HelloWorld, {
+  message: "Full-Stack Programming"
+});
+
 class IssueFilter extends React.Component {
   render() {
     return /*#__PURE__*/React.createElement("div", null, "This is placeholder for IssueFilter Component");
@@ -115,13 +126,45 @@ class IssueAdd extends React.Component {
   constructor() {
     super(); //when you have to call "this" in a constructor, you have to call super first.
 
+    this.handleSubmit = this.handleSubmit.bind(this);
+    /*
+    //Remove this 
     setTimeout(() => {
-      this.props.createIssue(newIssue);
+        this.props.createIssue(newIssue);
     }, 3000);
+      */
+  }
+
+  handleSubmit(e) {
+    e.preventDefault();
+    const form = document.forms.issueAdd;
+    const issue = {
+      owner: form.owner.value,
+      title: form.title.value,
+      status: 'New'
+    };
+    this.props.createIssue(issue);
+    form.owner.value = "";
+    form.title.value = "";
   }
 
   render() {
-    return /*#__PURE__*/React.createElement("div", null, "This is placeholder for IssueAdd Component");
+    return (
+      /*#__PURE__*/
+      //<div>This is placeholder for IssueAdd Component</div>    
+      React.createElement("form", {
+        name: "issueAdd",
+        onSubmit: this.handleSubmit
+      }, /*#__PURE__*/React.createElement("input", {
+        type: "text",
+        name: "owner",
+        placeholder: "Owner"
+      }), /*#__PURE__*/React.createElement("input", {
+        type: "text",
+        name: "title",
+        placeholder: "Title"
+      }), /*#__PURE__*/React.createElement("button", null, "Add"))
+    );
   }
 
 }
@@ -165,7 +208,8 @@ class IssueList extends React.Component {
     }));
   }
 
-}
+} //const element = <HelloWorld message="Full-Stack Programming" />;
+
 
 const element = /*#__PURE__*/React.createElement(IssueList, null);
 ReactDOM.render(element, document.getElementById('contents'));
