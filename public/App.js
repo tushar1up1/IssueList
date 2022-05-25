@@ -57,16 +57,37 @@ const initialIssues = [{
   due: new Date('2022-08-22'),
   title: 'Issue - 2'
 }];
+const newIssue = {
+  status: 'New',
+  owner: 'Person-C',
+  title: 'New Issue to be added'
+};
 
 class IssueTable extends React.Component {
+  /*
   constructor() {
-    super(); //when you have to call this in a constructor, you have to call super first.
-
-    this.state = {
-      issues: initialIssues
-    };
+      super(); //when you have to call "this" in a constructor, you have to call super first.
+      this.state = {issues: []};
+      setTimeout(() => {
+          this.createIssue(newIssue);
+      }, 3000);
   }
-
+  componentDidMount() {
+      this.loadData();
+  }
+    loadData() {
+      setTimeout(() => {
+      this.setState({ issues: initialIssues });
+      }, 1000);
+  }
+    createIssue(issue) {
+      issue.id = this.state.issues.length + 1;
+      issue.created = new Date();
+      const newIssueList = this.state.issues.slice();
+      newIssueList.push(issue);
+      this.setState({ issues: newIssueList });
+  }
+  */
   render() {
     //const rowStyle = {border: "1px solid silver", padding: 4};
 
@@ -74,7 +95,8 @@ class IssueTable extends React.Component {
         {id: 1, status: 'resolved', owner: 'Person-A', effort: 20, created: new Date('2022-05-16'), due: new Date('2022-08-20'), title: 'Issue - 1'},
         {id: 2, status: 'assigned', owner: 'Person-B', effort: 5, created: new Date('2022-05-18'), due: new Date('2022-08-22'), title: 'Issue - 2'}
     ]*/
-    const issueRows = this.state.issues.map(issue => /*#__PURE__*/React.createElement(IssueRow, {
+    //const issueRows = this.state.issues.map(issue => <IssueRow key={issue.id} issue={issue} />); 
+    const issueRows = this.props.issues.map(issue => /*#__PURE__*/React.createElement(IssueRow, {
       key: issue.id,
       issue: issue
     }));
@@ -90,6 +112,14 @@ class IssueTable extends React.Component {
 }
 
 class IssueAdd extends React.Component {
+  constructor() {
+    super(); //when you have to call "this" in a constructor, you have to call super first.
+
+    setTimeout(() => {
+      this.props.createIssue(newIssue);
+    }, 3000);
+  }
+
   render() {
     return /*#__PURE__*/React.createElement("div", null, "This is placeholder for IssueAdd Component");
   }
@@ -97,8 +127,42 @@ class IssueAdd extends React.Component {
 }
 
 class IssueList extends React.Component {
+  constructor() {
+    super();
+    this.state = {
+      issues: []
+    };
+    this.createIssue = this.createIssue.bind(this);
+  }
+
+  componentDidMount() {
+    this.loadData();
+  }
+
+  loadData() {
+    setTimeout(() => {
+      this.setState({
+        issues: initialIssues
+      });
+    }, 1000);
+  }
+
+  createIssue(issue) {
+    issue.id = this.state.issues.length + 1;
+    issue.created = new Date();
+    const newIssueList = this.state.issues.slice();
+    newIssueList.push(issue);
+    this.setState({
+      issues: newIssueList
+    });
+  }
+
   render() {
-    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h1", null, "Issue List"), /*#__PURE__*/React.createElement(IssueFilter, null), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueTable, null), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueAdd, null));
+    return /*#__PURE__*/React.createElement(React.Fragment, null, /*#__PURE__*/React.createElement("h1", null, "Issue List"), /*#__PURE__*/React.createElement(IssueFilter, null), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueTable, {
+      issues: this.state.issues
+    }), /*#__PURE__*/React.createElement("hr", null), /*#__PURE__*/React.createElement(IssueAdd, {
+      createIssue: this.createIssue
+    }));
   }
 
 }
