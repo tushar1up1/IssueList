@@ -41,33 +41,35 @@ class IssueFilter extends React.Component {
   }
 
 }
-
+/*
 class IssueRow extends React.Component {
-  render() {
-    //const style = this.props.rowStyle;
-    const issue = this.props.issue;
-    return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, issue.id), /*#__PURE__*/React.createElement("td", null, issue.status), /*#__PURE__*/React.createElement("td", null, issue.owner), /*#__PURE__*/React.createElement("td", null, issue.effort), /*#__PURE__*/React.createElement("td", null, issue.created.toDateString()), /*#__PURE__*/React.createElement("td", null, issue.due ? issue.due.toDateString() : ''), /*#__PURE__*/React.createElement("td", null, issue.title));
-  }
+    render() {
+        //const style = this.props.rowStyle;
+        const issue = this.props.issue;
+        return (
+            <tr>
+                 <td>{issue.id}</td>
+                 <td>{issue.status}</td>
+                 <td>{issue.owner}</td>
+                 <td>{issue.effort}</td>
+                 <td>{issue.created.toDateString()}</td>
+                 <td>{issue.due ? issue.due.toDateString() : ''}</td>
+                 <td>{issue.title}</td>
+              </tr>
+            
+        )
+    }
+}
+*/
 
+
+function IssueRow(props) {
+  //render() {
+  //const style = this.props.rowStyle;
+  const issue = props.issue;
+  return /*#__PURE__*/React.createElement("tr", null, /*#__PURE__*/React.createElement("td", null, issue.id), /*#__PURE__*/React.createElement("td", null, issue.status), /*#__PURE__*/React.createElement("td", null, issue.owner), /*#__PURE__*/React.createElement("td", null, issue.effort), /*#__PURE__*/React.createElement("td", null, issue.created), /*#__PURE__*/React.createElement("td", null, issue.due ? issue.due : ''), /*#__PURE__*/React.createElement("td", null, issue.title)); //}
 }
 
-const initialIssues = [{
-  id: 1,
-  status: 'resolved',
-  owner: 'Person-A',
-  effort: 20,
-  created: new Date('2022-05-16'),
-  due: new Date('2022-08-20'),
-  title: 'Issue - 1'
-}, {
-  id: 2,
-  status: 'assigned',
-  owner: 'Person-B',
-  effort: 5,
-  created: new Date('2022-05-18'),
-  due: new Date('2022-08-22'),
-  title: 'Issue - 2'
-}];
 const newIssue = {
   status: 'New',
   owner: 'Person-C',
@@ -124,15 +126,8 @@ class IssueTable extends React.Component {
 
 class IssueAdd extends React.Component {
   constructor() {
-    super(); //when you have to call "this" in a constructor, you have to call super first.
-
+    super();
     this.handleSubmit = this.handleSubmit.bind(this);
-    /*
-    //Remove this 
-    setTimeout(() => {
-        this.props.createIssue(newIssue);
-    }, 3000);
-      */
   }
 
   handleSubmit(e) {
@@ -141,7 +136,8 @@ class IssueAdd extends React.Component {
     const issue = {
       owner: form.owner.value,
       title: form.title.value,
-      status: 'New'
+      status: 'New',
+      due: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 10)
     };
     this.props.createIssue(issue);
     form.owner.value = "";
@@ -169,6 +165,47 @@ class IssueAdd extends React.Component {
 
 }
 
+const dateRegex = new RegExp('^\\d\\d\\d\\d-\\d\\d-\\d\\d');
+
+function jsonDateReviver(key, value) {
+  if (dateRegex.test(value)) return new Date(value);
+  return value;
+}
+
+async function graphQLFetch(query, variables = {}) {
+  console.log(query, variables);
+
+  try {
+    const response = await fetch('/graphql', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        query,
+        variables
+      })
+    });
+    const body = await response.text();
+    const result = JSON.parse(body, jsonDateReviver);
+
+    if (result.errors) {
+      const error = result.errors[0];
+
+      if (error.extensions.code == 'BAD_USER_INPUT') {
+        const details = error.extensions.exception.errors.join('\n ');
+        alert(`${error.message}:\n ${details}`);
+      } else {
+        alert(`${error.extensions.code}: ${error.message}`);
+      }
+    }
+
+    return result.data;
+  } catch (e) {
+    alert(`Error in sending data to server: ${e.message}`);
+  }
+}
+
 class IssueList extends React.Component {
   constructor() {
     super();
@@ -183,21 +220,88 @@ class IssueList extends React.Component {
   }
 
   loadData() {
-    setTimeout(() => {
-      this.setState({
-        issues: initialIssues
+    /*setTimeout(() => {
+    this.setState({ issues: initialIssues });
+    }, 1000);*/
+    const query = `query {
+                issueList {
+                    id title status owner
+                    created effort due
+                }
+            }`;
+
+    async function IssueData(url = '', data = {}) {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query
+        })
       });
-    }, 1000);
+      return response.json();
+    }
+
+    IssueData('/graphql', query).then(result => {
+      //console.log(result.data.issueList);
+      this.setState({
+        issues: result.data.issueList
+      });
+      return result.data.issueList;
+    });
+    /*const data = await graphQLFetch(query);
+    if (data) {
+        this.setState({ issues: data.issueList });
+    }*/
+    //this.setState({ issues: result});    
   }
 
-  createIssue(issue) {
-    issue.id = this.state.issues.length + 1;
+  async createIssue(issue) {
+    /*issue.id = this.state.issues.length + 1;
     issue.created = new Date();
     const newIssueList = this.state.issues.slice();
     newIssueList.push(issue);
-    this.setState({
-      issues: newIssueList
+    this.setState({ issues: newIssueList });*/
+    //console.log(issue)
+
+    /*const query = `
+        mutation {
+            issueAdd(issue:{
+                title: "${issue.title}",
+                owner: "${issue.owner}",
+                due: "${issue.due.toISOString()}",
+            }) {
+                id
+            }
+        }`;
+    */
+    const query = `
+                mutation issueAdd($issue: IssueInputs!) {
+                        issueAdd(issue: $issue) {
+                            id
+                            title
+                            status
+                            owner                            
+                        } 
+                }`;
+    /*    
+    const response = await fetch('/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json'},
+        //body: JSON.stringify({ query})
+        body: JSON.stringify({ query, variables: {issue} })
+        });
+    this.loadData();   
+    */
+
+    const data = await graphQLFetch(query, {
+      issue
     });
+
+    if (data) {
+      this.loadData();
+    }
   }
 
   render() {
