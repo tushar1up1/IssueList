@@ -1,0 +1,34 @@
+enum StatusType {
+    New
+    Assigned
+    Fixed
+    Closed
+}
+
+input IssueInputs {
+    title: String!   
+    status: StatusType = New 
+    owner: String
+    effort: Int
+    due: Date
+}
+scalar Date
+
+type Issue {
+    _id: ID!
+    id: Int!
+    title: String!
+    status: StatusType!
+    owner: String!
+    effort: Int
+    created: Date!
+    due: Date
+}
+type Query {
+    greeting: String!,
+    issueList: [Issue!]!
+}
+type Mutation {
+    setGreetingMessage(message: String!): String,
+    issueAdd(issue: IssueInputs!): Issue!
+}

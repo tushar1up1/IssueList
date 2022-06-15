@@ -1,6 +1,10 @@
 const express = require("express")
 const { ApolloServer, UserInputError } = require('apollo-server-express');
 const { GraphQLScalarType, Kind } = require('graphql');
+const fs = require('fs');
+require('../models/db');
+const Issue = require('../models/issues');
+const Counter = require('../models/counters');
 
 let greetingMessage = "Use apollo server for GraphQL";
 const initialIssues = [
@@ -12,7 +16,7 @@ const dateScalar = new GraphQLScalarType({
     name: 'Date',
     description: 'Date custom scalar type',
     serialize(value) {
-        return value.toISOString(); // Convert outgoing Date to integer for JSON
+        return (value.toISOString()).substring(0,10); 
     },
     parseValue(value) {
         
@@ -30,41 +34,6 @@ const dateScalar = new GraphQLScalarType({
     },
   });
 
-const typeDefs = `
-enum StatusType {
-    New
-    Assigned
-    Fixed
-    Closed
-}
-
-input IssueInputs {
-    title: String!   
-    status: StatusType = New 
-    owner: String
-    effort: Int
-    due: Date
-}
-scalar Date
-
-type Issue {
-    id: Int!
-    title: String!
-    status: StatusType!
-    owner: String!
-    effort: Int
-    created: Date!
-    due: Date
-}
-type Query {
-    greeting: String!,
-    issueList: [Issue!]!
-}
-type Mutation {
-    setGreetingMessage(message: String!): String,
-    issueAdd(issue: IssueInputs!): Issue!
-}`;
-
 const resolvers = {
     Date: dateScalar,
     Query: {
@@ -81,7 +50,14 @@ function setGreetingMessage(_, { message }) {
     return greetingMessage = message;
 }
 function issueList() {
-    return initialIssues;
+    const issues = Issue.find({})
+        .then(issues => {
+            return issues;
+        })
+        .catch(error=>{
+            res.json(error)
+        })  
+        return issues;      
 }
 function validateIssue(issue) {
     console.log(issue)
@@ -98,20 +74,32 @@ function validateIssue(issue) {
     }
 }
 
-function issueAdd(_, {issue}) {
+async function getNextIDSequence(name) {
+    const result = await Counter.findOneAndUpdate(
+    { name: name },
+    { $inc: { current: 1 } },
+    { returnOriginal: false },
+    );
+    console.log(result)
+    return result.current;
+}
+
+async function issueAdd(_, {issue}) {
     validateIssue(issue);
-    issue.created = new Date();
-    issue.id = initialIssues.length + 1;
-    //if (issue.status === undefined) issue.status = 'New';
+    issue.id = await getNextIDSequence('issues');
+    await Issue.create(issue)
+        .then(counter => {
+            console.log(counter)
+        })
+        .catch(error=>{
+            res.json(error)
+        }) 
     
-    initialIssues.push(issue);
     return issue;
 }
 
-
-
 const server = new ApolloServer({
-    typeDefs,
+    typeDefs: fs.readFileSync('./server/schema_graphql', 'utf-8'),
     resolvers,
     formatError: error => {
         console.log(error);

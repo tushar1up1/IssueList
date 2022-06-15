@@ -225,8 +225,14 @@ class IssueList extends React.Component {
     }, 1000);*/
     const query = `query {
                 issueList {
-                    id title status owner
-                    created effort due
+                    _id
+                    id 
+                    title 
+                    status 
+                    owner
+                    created 
+                    effort 
+                    due
                 }
             }`;
 
