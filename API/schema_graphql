@@ -1,0 +1,52 @@
+enum StatusType {
+    New
+    Assigned
+    Fixed
+    Closed
+}
+
+input IssueInputs {
+    title: String!
+    status: StatusType = New
+    owner: String
+    effort: Int
+    due: Date
+}
+scalar Date
+
+type Issue {
+    _id: String!
+    id: Int!
+    title: String!
+    status: StatusType!
+    owner: String
+    effort: Int
+    created: Date!
+    due: Date
+}
+
+type Query {
+    greeting: String!,
+    issueList(filterInputFields: FilterInputFields): [Issue!]!    
+}
+
+input IssueUpdatePayload {
+    _id: String!
+    effort: Int!
+    owner: String!
+    status: String!
+    title: String! 
+}
+
+
+type Mutation {
+    setGreetingMessage(message: String!): String
+    issueAdd(issue: IssueInputs!): Issue!
+    updateIssue(modifyIssue: IssueUpdatePayload) : Boolean
+    SingleIssue(_id: String!) : Issue
+}
+
+input FilterInputFields {
+    owner: String
+    status: String
+}
